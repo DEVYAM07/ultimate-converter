@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Converter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Ultimate Converter</h1>
+    <p>Convert webpages to PDF or EPUB easily!</p>
+
+    <!-- Format Selection -->
+    <div>
+      <label for="output-format">Select Output Format:</label>
+      <select id="output-format">
+        <option value="pdf">PDF</option>
+        <option value="epub">EPUB</option>
+      </select>
+    </div>
+
+    <!-- Custom Page Range (For PDF Only) -->
+    <div id="pdf-options">
+      <h2>PDF Options</h2>
+      <div class="page-range">
+        <label>Start Page: <input type="number" id="start-page" min="1"></label>
+        <label>End Page: <input type="number" id="end-page" min="1"></label>
+      </div>
+    </div>
+
+    <!-- Convert Buttons -->
+    <button id="convert-tab">Convert Active Tab</button>
+    <div>
+      <h2>Convert from URL</h2>
+      <input type="text" id="url-input" placeholder="Enter URL">
+      <button id="convert-url">Convert URL</button>
+    </div>
+
+    <!-- Status Display -->
+    <div id="status"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
