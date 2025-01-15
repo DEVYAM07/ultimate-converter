@@ -3,43 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultimate Converter</title>
+  <title>Gen Z Webpage Converter</title>
   <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Inline styles for demonstration */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6f42c1, #1c1f25);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      background: #282c34;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    header {
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      font-weight: 300;
+      margin: 5px 0 0;
+    }
+
+    .input-box {
+      margin: 20px 0;
+    }
+
+    input[type="url"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .btn {
+      background: #0078d4;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #005bb5;
+    }
+
+    .options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .option {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-box {
+      margin: 20px 0;
+      background: #1c1f25;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    #status {
+      font-size: 14px;
+      margin: 0;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    .highlight {
+      font-weight: 700;
+      color: #f39c12;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Ultimate Converter</h1>
-    <p>Convert webpages to PDF or EPUB easily!</p>
+    <header>
+      <h1 class="title">✨ WebConvertX</h1>
+      <p class="subtitle">Turn any webpage into PDF or EPUB with style! 🚀</p>
+    </header>
 
-    <!-- Format Selection -->
-    <div>
-      <label for="output-format">Select Output Format:</label>
-      <select id="output-format">
-        <option value="pdf">PDF</option>
-        <option value="epub">EPUB</option>
-      </select>
-    </div>
-
-    <!-- Custom Page Range (For PDF Only) -->
-    <div id="pdf-options">
-      <h2>PDF Options</h2>
-      <div class="page-range">
-        <label>Start Page: <input type="number" id="start-page" min="1"></label>
-        <label>End Page: <input type="number" id="end-page" min="1"></label>
+    <main>
+      <div class="input-box">
+        <input type="url" id="url-input" placeholder="Enter a webpage URL" required />
+        <button id="convert-btn" class="btn">Convert</button>
       </div>
-    </div>
 
-    <!-- Convert Buttons -->
-    <button id="convert-tab">Convert Active Tab</button>
-    <div>
-      <h2>Convert from URL</h2>
-      <input type="text" id="url-input" placeholder="Enter URL">
-      <button id="convert-url">Convert URL</button>
-    </div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="format" value="pdf" checked>
+          <span>PDF</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="format" value="epub">
+          <span>EPUB</span>
+        </label>
+      </div>
 
-    <!-- Status Display -->
-    <div id="status"></div>
+      <div id="status-box" class="status-box">
+        <p id="status">Enter a URL to get started!</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>Built for the future 🌐 by <span class="highlight">Gen Z Devs</span></p>
+    </footer>
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
