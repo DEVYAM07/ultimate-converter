@@ -1,18 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Ultimate Converter: PDF & EPUB",
-  "description": "Convert webpages to PDF or EPUB formats seamlessly.",
-  "version": "3.0",
+  "name": "Webpage Converter",
+  "version": "1.0",
+  "description": "Convert webpages to PDF or EPUB",
   "permissions": [
     "activeTab",
-    "scripting",
     "downloads",
-    "storage",
-    "notifications"
+    "scripting"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html"
   },
