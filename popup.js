@@ -1,40 +1,30 @@
-// Dynamically load required libraries
-const loadLibrary = (src) => {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-    document.head.appendChild(script);
-  });
-};
+document.getElementById('convert-btn').addEventListener('click', () => {
+  const url = document.getElementById('url-input').value.trim();
+  const statusElement = document.getElementById('status');
 
-// Load jsPDF and EPUB libraries
-Promise.all([
-  loadLibrary('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js'),
-  loadLibrary('https://cdn.jsdelivr.net/npm/epub-gen')
-]).then(() => console.log("Libraries loaded successfully!"));
-
-// Handle conversions
-document.getElementById('convert-tab').addEventListener('click', () => {
-  const format = document.getElementById('output-format').value;
-  if (format === 'pdf') {
-    chrome.runtime.sendMessage({ action: 'convertToPDF', options: getPDFOptions() });
-  } else if (format === 'epub') {
-    chrome.runtime.sendMessage({ action: 'convertToEPUB' });
+  // Validate the URL input
+  if (!url) {
+    alert('Please enter a valid URL.');
+    return;
   }
+
+  // Update status
+  statusElement.textContent = 'Converting... Please wait...';
+
+  // Send the URL to the background script for PDF conversion
+  chrome.runtime.sendMessage(
+    { action: 'convertToPDF', url },
+    (response) => {
+      console.log('Response from background.js:', response);
+
+      if (response && response.success) {
+        statusElement.textContent = 'Conversion successful! Downloading...';
+      } else {
+        const errorMessage = response?.error || 'Unknown error occurred.';
+        statusElement.textContent = `Error: ${errorMessage}`;
+        console.error('Error received from background.js:', errorMessage);
+      }
+    }
+  );
 });
 
-// Get PDF options from inputs
-const getPDFOptions = () => {
-  const startPage = parseInt(document.getElementById('start-page').value, 10);
-  const endPage = parseInt(document.getElementById('end-page').value, 10);
-  return { startPage, endPage };
-};
-
-// Status updates
-const updateStatus = (message, isError = false) => {
-  const status = document.getElementById('status');
-  status.textContent = message;
-  status.style.color = isError ? '#e74c3c' : '#1abc9c';
-};
