@@ -1,70 +1,98 @@
+// Ensure the service worker is active and log its status
+console.log('Service worker started');
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Extension installed, service worker active');
+});
+
+// Listener to keep the service worker awake
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'convertToPDF') {
-    const url = message.url;
+  console.log('Message received in service worker:', message);
 
-    // Validate the URL
-    if (!url) {
-      sendResponse({ success: false, error: 'Invalid URL provided.' });
-      console.error('Error: No URL provided.');
-      return;
-    }
+  if (message.action === 'ping') {
+    console.log('Ping received, service worker is awake');
+    sendResponse({ success: true, message: 'Service worker is active' });
+    return;
+  }
 
-    console.log('Starting PDF conversion for URL:', url);
+  if (message.action === 'convert') {
+    const { url, format } = message;
 
-    // Fetch the page content
+    console.log(`Received request to convert ${url} to ${format}`);
+
+    // Fetch the webpage content
     fetch(url)
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Failed to fetch URL. Status: ${response.status}`);
+          throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
         }
         return response.text();
       })
-      .then((htmlContent) => {
-        console.log('Content fetched successfully. Initializing jsPDF...');
-
-        // Check if jsPDF is loaded
-        if (typeof window.jspdf === 'undefined') {
-          console.error('Error: jsPDF library is not loaded.');
-          sendResponse({ success: false, error: 'jsPDF library not loaded.' });
-          return;
+      .then((html) => {
+        console.log('Webpage fetched successfully.');
+        if (format === 'pdf') {
+          generatePDF(html, sendResponse);
+        } else if (format === 'epub') {
+          generateEPUB(html, sendResponse);
+        } else {
+          throw new Error('Unsupported format.');
         }
-
-        // Initialize jsPDF and generate PDF
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
-
-        pdf.html(htmlContent, {
-          callback: function (doc) {
-            const pdfBlob = doc.output('blob');
-            const blobURL = URL.createObjectURL(pdfBlob);
-
-            // Trigger the download
-            chrome.downloads.download(
-              {
-                url: blobURL,
-                filename: 'converted.pdf',
-                saveAs: true,
-              },
-              (downloadId) => {
-                if (chrome.runtime.lastError) {
-                  console.error('Error during download:', chrome.runtime.lastError.message);
-                  sendResponse({ success: false, error: chrome.runtime.lastError.message });
-                } else {
-                  console.log('PDF downloaded successfully. Download ID:', downloadId);
-                  sendResponse({ success: true });
-                }
-              }
-            );
-          },
-          x: 10,
-          y: 10,
-        });
       })
       .catch((error) => {
-        console.error('Error during PDF conversion:', error.message);
+        console.error('Error during fetch or conversion:', error);
         sendResponse({ success: false, error: error.message });
       });
 
-    return true; // Keep the message channel open
+    return true; // Keeps the response channel open
   }
 });
+
+// Function to generate PDF
+function generatePDF(html, sendResponse) {
+  try {
+    console.log('Starting PDF generation...');
+    importScripts('libs/jspdf.umd.min.js');
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+    doc.html(html, {
+      callback: () => {
+        console.log('PDF generated successfully.');
+        const blob = doc.output('blob');
+        const url = URL.createObjectURL(blob);
+
+        chrome.downloads.download(
+          { url, filename: 'webpage.pdf' },
+          () => {
+            console.log('PDF download initiated.');
+            sendResponse({ success: true });
+          }
+        );
+      },
+      x: 10,
+      y: 10,
+    });
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    sendResponse({ success: false, error: error.message });
+  }
+}
+
+// Function to generate EPUB
+function generateEPUB(html, sendResponse) {
+  try {
+    console.log('Starting EPUB generation...');
+    const epubBlob = new Blob([html], { type: 'application/epub+zip' });
+    const url = URL.createObjectURL(epubBlob);
+
+    chrome.downloads.download(
+      { url, filename: 'webpage.epub' },
+      () => {
+        console.log('EPUB download initiated.');
+        sendResponse({ success: true });
+      }
+    );
+  } catch (error) {
+    console.error('Error generating EPUB:', error);
+    sendResponse({ success: false, error: error.message });
+  }
+}
